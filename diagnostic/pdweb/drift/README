@@ -1,0 +1,35 @@
+# ivia_drift.sh - configuration drift detector for IBM Verify Identity Access (IVIA)
+# Uses only curl + jq against the LMI REST API. Read-only: it never changes the appliance.
+#
+# Environment:
+#   IVIA_HOST       required, LMI base URL, e.g. https://ivia.example.com:9443
+#   IVIA_USER       LMI user (default: admin)
+#   IVIA_PASS       LMI password (prompted if unset)
+#   IVIA_CACERT     CA bundle for TLS verification (recommended)
+#   IVIA_INSECURE   set to 1 to skip TLS verification (lab use only)
+#   IVIA_TIMEOUT    per-request timeout in seconds (default: 30)
+#   DRIFT_IGNORE_KEYS  regex of entry keys to ignore when comparing (node-specific keys)
+#   DRIFT_MASK_KEYS    regex of entry keys whose values are masked in snapshots
+#
+# Exit codes: 0 no drift, 1 drift found, 2 usage/connection error.
+#
+# This tool is used to detect configuration differences between two nodes.
+# To use, first set the environments above for the first node being compared:
+#   export IVIA_HOST=<your LMI for NodeA>
+#   export IVIA_USER=<your LMI admin for NodeA>
+#   export IVIA_PASS=<your LMI password for NodeA>
+#
+# Generate NodeA snapshot which will be used to compare vs second node
+#   ./ivia_drift.sh snapshot -o nodeA
+#
+# Set the environments above for the second node being compared:
+#   export IVIA_HOST=<your LMI for NodeB>
+#   export IVIA_USER=<your LMI admin for NodeB>
+#   export IVIA_PASS=<your LMI password for NodeB>
+#
+# Generate NodeB snapshot to compare vs NodeA
+#   ./ivia_drift.sh snapshot -o nodeB
+#
+# Once NodeA and NodeB snapshots are created, run the compare command.
+#   ./ivia_drift.sh compare nodeA nodeB
+#
